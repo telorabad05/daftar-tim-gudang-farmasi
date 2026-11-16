@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Tim Gudang Farmasi — Tim Kurir &amp; Tim Obat</title>
+<style>
+  :root{ --line:#c9d4d8; --bg:#eef3f4; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:"Segoe UI", Arial, Helvetica, sans-serif; background:var(--bg); color:#000; }
+  header.band{ background:#fff; border-bottom:3px solid #000; color:#000; padding:20px 16px 16px; }
+  header.band .wrap{ max-width:1280px; margin:0 auto; }
+  header.band h1{ margin:4px 0 2px; font-size:22px; line-height:1.3; }
+  header.band p{ margin:0; font-size:14px; }
+  main{ max-width:1280px; margin:0 auto; padding:16px; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+  .card h2{ margin:0 0 12px; font-size:17px; color:#000; text-align:center; }
+  .cols{ display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; }
+  .cols > .card{ flex:1 1 420px; }
+  label{ display:block; font-size:13px; font-weight:600; color:#000; margin-bottom:4px; }
+  input[type="text"]{ width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; font-size:15px; background:#fff; color:#000; }
+  .toolbar{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:16px; }
+  button{ font:inherit; cursor:pointer; border-radius:8px; padding:9px 16px; font-weight:600; }
+  .btn-primary{ background:#fff; border:1px solid #000; color:#000; }
+  .btn-primary:hover{ background:#e8e8e8; }
+  .btn-ghost{ background:#fff; border:1px solid #000; color:#000; }
+  .btn-danger{ background:#fff; border:1px solid #c0392b; color:#000; padding:4px 10px; font-size:13px; }
+  .btn-small{ padding:4px 10px; font-size:13px; }
+  .status{ font-size:13px; color:#000; }
+  table.grid{ border-collapse:collapse; width:100%; margin-bottom:10px; }
+  table.grid th, table.grid td{ border:1px solid #9fb0b5; padding:6px; font-size:14px; vertical-align:middle; }
+  table.grid th{ background:#e8e8e8; text-align:center; color:#000; }
+  table.grid td input{ width:100%; border:none; padding:4px; font-size:14px; background:transparent; color:#000; }
+  table.grid td input:focus{ outline:2px solid #000; background:#fff; }
+  td.no, th.no{ width:36px; text-align:center; }
+  td.act, th.act{ width:44px; text-align:center; }
+  td.teamcell{ text-align:center; font-weight:700; font-size:16px; }
+  td.tempatcell{ text-align:center; }
+  .teamhead{ display:flex; gap:8px; align-items:center; margin:14px 0 8px; }
+  .teamhead input{ font-weight:700; }
+  .row2{ display:flex; flex-wrap:wrap; gap:12px; }
+  .field{ flex:1 1 220px; }
+  #printArea{ display:none; }
+  @media print{
+    @page{ size:landscape; margin:10mm; }
+    body{ background:#fff; }
+    header.band, main{ display:none !important; }
+    #printArea{ display:block !important; color:#000; font-size:12px; }
+    #printArea table{ border-collapse:collapse; width:100%; margin-bottom:12px; }
+    #printArea th, #printArea td{ border:1px solid #000; padding:4px 6px; font-size:12px; }
+    #printArea th{ text-align:center; background:#e8e8e8; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    #printArea .judul{ font-weight:bold; text-align:center; font-size:14px; margin-bottom:8px; }
+    #printArea td.teamcell{ text-align:center; font-weight:bold; font-size:14px; }
+    #printArea td.tempatcell{ text-align:center; }
+  }
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <h1>Daftar Tim Gudang Farmasi</h1>
+    <p>Tim Kurir dan Tim Obat &mdash; nama dan tempat tugas bisa diubah, disimpan, dan dicetak.</p>
+  </div>
+</header>
+<main>
+  <div class="toolbar">
+    <button class="btn-primary" id="btnSimpan">Simpan</button>
+    <button class="btn-ghost" id="btnCetak">Cetak Daftar</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h2>Daftar TIM KURIR Gudang Farmasi</h2>
+
+      <table class="grid">
+        <thead><tr><th class="no">No</th><th>Nama</th><th>Tempat Tugas</th><th class="act"></th></tr></thead>
+        <tbody id="khususBody"></tbody>
+      </table>
+      <button class="btn-ghost btn-small" id="btnKhusus">+ Tambah Baris</button>
+
+      <div id="teams"></div>
+      <button class="btn-ghost btn-small" id="btnTeam" style="margin-top:6px;">+ Tambah Tim</button>
+    </div>
+
+    <div class="card">
+      <h2>Daftar TIM Obat Gudang Farmasi</h2>
+      <table class="grid">
+        <thead><tr><th class="no">No</th><th>Nama</th><th>Tempat Tugas</th><th class="act"></th></tr></thead>
+        <tbody id="obatBody"></tbody>
+      </table>
+      <button class="btn-ghost btn-small" id="btnObat">+ Tambah Baris</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="text-align:left;">Tanda Tangan</h2>
+    <div class="row2">
+      <div class="field"><label>Jabatan</label><input type="text" id="sgTitle"></div>
+      <div class="field"><label>Nama</label><input type="text" id="sgName"></div>
+    </div>
+  </div>
+</main>
+<div id="printArea"></div>
+
+<script>
+"use strict";
+var DB_KEY = "daftarTimGudangFarmasi.v1";
+
+function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+function el(id){ return document.getElementById(id); }
+
+function defaultData(){
+  return {
+    khusus: [ { nama:"Fahmi", tempat:"Oksigen" }, { nama:"Yusuf", tempat:"Gudang" } ],
+    teams: [
+      { nama:"TIM A", tempat:"PJT/PCC/IRD", anggota:["Rombe","Sigit","Firman Senior","Suaib"] },
+      { nama:"TIM B", tempat:"KIA/ COT/RJ", anggota:["Pak Aswin","Afiq","Zul","Indra"] },
+      { nama:"TIM C", tempat:"RIA/ICU HD", anggota:["Firman Junior","Aswin Junior","Rifai",""] }
+    ],
+    obat: [ { nama:"", tempat:"" }, { nama:"", tempat:"" }, { nama:"", tempat:"" } ],
+    sign: { title:"KaSub Instalasi Pelayanan Kefarmasian Unit Pelayanan 5", name:"Juwita, S.Si, Apt., M.Kes" }
+  };
+}
+
+var state = defaultData();
+(function load(){
+  try{
+    var d = JSON.parse(localStorage.getItem(DB_KEY));
+    if(d && d.khusus && d.teams && d.obat) state = d;
+  }catch(e){}
+})();
+
+function pairRows(tbody, list, prefix){
+  tbody.innerHTML = "";
+  list.forEach(function(r, i){
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td class='no'>" + (i+1) + "</td>" +
+      "<td><input type='text' data-p='" + prefix + "' data-i='" + i + "' data-f='nama' value='" + esc(r.nama) + "'></td>" +
+      "<td><input type='text' data-p='" + prefix + "' data-i='" + i + "' data-f='tempat' value='" + esc(r.tempat) + "'></td>" +
+      "<td class='act'><button class='btn-danger' data-p='" + prefix + "' data-del='" + i + "'>&times;</button></td>";
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll("input").forEach(function(inp){
+    inp.addEventListener("input", function(){
+      list[parseInt(inp.getAttribute("data-i"),10)][inp.getAttribute("data-f")] = inp.value;
+    });
+  });
+  tbody.querySelectorAll("button[data-del]").forEach(function(b){
+    b.addEventListener("click", function(){
+      list.splice(parseInt(b.getAttribute("data-del"),10), 1);
+      renderAll();
+    });
+  });
+}
+
+function renderTeams(){
+  var box = el("teams");
+  box.innerHTML = "";
+  state.teams.forEach(function(t, ti){
+    var head = document.createElement("div");
+    head.className = "teamhead";
+    head.innerHTML = "<input type='text' data-team='" + ti + "' value='" + esc(t.nama) + "' style='max-width:180px;'>" +
+      "<button class='btn-danger' data-delteam='" + ti + "'>Hapus Tim</button>";
+    box.appendChild(head);
+
+    var table = document.createElement("table");
+    table.className = "grid";
+    var rowsHtml = "";
+    var n = Math.max(t.anggota.length, 1);
+    t.anggota.forEach(function(a, ai){
+      rowsHtml += "<tr><td class='no'>" + (ai+1) + "</td>" +
+        "<td><input type='text' data-team='" + ti + "' data-ai='" + ai + "' value='" + esc(a) + "'></td>";
+      if(ai === 0){
+        rowsHtml += "<td class='teamcell' rowspan='" + n + "'>" + esc(t.nama) + "</td>" +
+          "<td class='tempatcell' rowspan='" + n + "'><input type='text' data-tempat='" + ti + "' value='" + esc(t.tempat) + "' style='text-align:center;'></td>";
+      }
+      rowsHtml += "<td class='act'><button class='btn-danger' data-team='" + ti + "' data-delanggota='" + ai + "'>&times;</button></td></tr>";
+    });
+    table.innerHTML = "<thead><tr><th class='no'>No</th><th>Nama</th><th></th><th>Tempat Tugas</th><th class='act'></th></tr></thead><tbody>" + rowsHtml + "</tbody>";
+    box.appendChild(table);
+
+    var add = document.createElement("button");
+    add.className = "btn-ghost btn-small";
+    add.textContent = "+ Tambah Anggota";
+    add.setAttribute("data-addanggota", ti);
+    box.appendChild(add);
+  });
+
+  box.querySelectorAll("input[data-team]").forEach(function(inp){
+    inp.addEventListener("input", function(){
+      var ti = parseInt(inp.getAttribute("data-team"),10);
+      if(inp.hasAttribute("data-ai")){
+        state.teams[ti].anggota[parseInt(inp.getAttribute("data-ai"),10)] = inp.value;
+      } else {
+        state.teams[ti].nama = inp.value;
+        renderTeamsSoft(ti);
+      }
+    });
+  });
+  box.querySelectorAll("input[data-tempat]").forEach(function(inp){
+    inp.addEventListener("input", function(){
+      state.teams[parseInt(inp.getAttribute("data-tempat"),10)].tempat = inp.value;
+    });
+  });
+  box.querySelectorAll("button[data-delanggota]").forEach(function(b){
+    b.addEventListener("click", function(){
+      state.teams[parseInt(b.getAttribute("data-team"),10)].anggota.splice(parseInt(b.getAttribute("data-delanggota"),10), 1);
+      renderAll();
+    });
+  });
+  box.querySelectorAll("button[data-delteam]").forEach(function(b){
+    b.addEventListener("click", function(){
+      state.teams.splice(parseInt(b.getAttribute("data-delteam"),10), 1);
+      renderAll();
+    });
+  });
+  box.querySelectorAll("button[data-addanggota]").forEach(function(b){
+    b.addEventListener("click", function(){
+      state.teams[parseInt(b.getAttribute("data-addanggota"),10)].anggota.push("");
+      renderAll();
+    });
+  });
+}
+function renderTeamsSoft(ti){
+  var cells = el("teams").querySelectorAll("td.teamcell");
+  if(cells[ti]) cells[ti].textContent = state.teams[ti].nama;
+}
+
+function renderAll(){
+  pairRows(el("khususBody"), state.khusus, "khusus");
+  pairRows(el("obatBody"), state.obat, "obat");
+  renderTeams();
+  el("sgTitle").value = state.sign.title || "";
+  el("sgName").value = state.sign.name || "";
+}
+el("sgTitle").addEventListener("input", function(){ state.sign.title = this.value; });
+el("sgName").addEventListener("input", function(){ state.sign.name = this.value; });
+
+el("btnKhusus").addEventListener("click", function(){ state.khusus.push({ nama:"", tempat:"" }); renderAll(); });
+el("btnObat").addEventListener("click", function(){ state.obat.push({ nama:"", tempat:"" }); renderAll(); });
+el("btnTeam").addEventListener("click", function(){
+  state.teams.push({ nama:"TIM " + String.fromCharCode(65 + state.teams.length), tempat:"", anggota:[""] });
+  renderAll();
+});
+
+el("btnSimpan").addEventListener("click", function(){
+  localStorage.setItem(DB_KEY, JSON.stringify(state));
+  el("status").textContent = "Tersimpan di browser perangkat ini.";
+});
+el("btnCetak").addEventListener("click", function(){ buildPrint(); window.print(); });
+
+function pairPrint(list){
+  var h = "<table><tr><th style='width:36px;'>No</th><th>Nama</th><th>Tempat Tugas</th></tr>";
+  list.forEach(function(r, i){
+    h += "<tr><td style='text-align:center;'>" + (i+1) + "</td><td>" + esc(r.nama) + "</td><td>" + esc(r.tempat) + "</td></tr>";
+  });
+  return h + "</table>";
+}
+function teamPrint(t){
+  var n = Math.max(t.anggota.length, 1);
+  var h = "<table>";
+  t.anggota.forEach(function(a, ai){
+    h += "<tr><td style='width:36px;text-align:center;'>" + (ai+1) + "</td><td>" + esc(a) + "</td>";
+    if(ai === 0){
+      h += "<td class='teamcell' rowspan='" + n + "' style='width:30%;'>" + esc(t.nama) + "</td>" +
+           "<td class='tempatcell' rowspan='" + n + "' style='width:30%;'><div style='font-weight:bold;border-bottom:1px solid #000;margin:-4px -6px 4px;padding:4px 6px;background:#e8e8e8;'>Tempat Tugas</div>" + esc(t.tempat) + "</td>";
+    }
+    h += "</tr>";
+  });
+  return h + "</table>";
+}
+function buildPrint(){
+  var left = "<div class='judul'>Daftar TIM KURIR Gudang Farmasi</div>" + pairPrint(state.khusus);
+  state.teams.forEach(function(t){ left += teamPrint(t); });
+  left += "<div style='margin-top:30px;'>" + esc(state.sign.title) + "<br><br><br><br>( " + esc(state.sign.name) + " )</div>";
+  var right = "<div class='judul'>Daftar TIM Obat Gudang Farmasi</div>" + pairPrint(state.obat);
+  el("printArea").innerHTML = "<table style='border:none;'><tr>" +
+    "<td style='border:none;width:55%;vertical-align:top;padding-right:14px;'>" + left + "</td>" +
+    "<td style='border:none;width:45%;vertical-align:top;'>" + right + "</td></tr></table>";
+}
+
+renderAll();
+</script>
+</body>
+</html>
