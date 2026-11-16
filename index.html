@@ -69,6 +69,14 @@
     <span class="status" id="status"></span>
   </div>
 
+  <div class="card">
+    <h2 style="text-align:left;">Identitas Rumah Sakit</h2>
+    <div class="row2">
+      <div class="field"><label>Nama RS</label><input type="text" id="rsNama" placeholder="Nama rumah sakit"></div>
+      <div class="field"><label>Alamat</label><input type="text" id="rsAlamat" placeholder="Alamat rumah sakit"></div>
+    </div>
+  </div>
+
   <div class="cols">
     <div class="card">
       <h2>Daftar TIM KURIR Gudang Farmasi</h2>
@@ -131,6 +139,7 @@ function defaultData(){
     ],
     obat: [ { nama:"", tempat:"" }, { nama:"", tempat:"" }, { nama:"", tempat:"" } ],
     alkes: [ { nama:"", tempat:"" }, { nama:"", tempat:"" }, { nama:"", tempat:"" } ],
+    rs: { nama:"", alamat:"" },
     sign: { title:"KaSub Instalasi Pelayanan Kefarmasian Unit Pelayanan 5", name:"Juwita, S.Si, Apt., M.Kes" }
   };
 }
@@ -142,6 +151,7 @@ var state = defaultData();
     if(d && d.khusus && d.teams && d.obat){
       state = d;
       if(!state.alkes) state.alkes = [ { nama:"", tempat:"" }, { nama:"", tempat:"" }, { nama:"", tempat:"" } ];
+      if(!state.rs) state.rs = { nama:"", alamat:"" };
       if(!state.sign) state.sign = defaultData().sign;
     }
   }catch(e){}
@@ -250,7 +260,11 @@ function renderAll(){
   renderTeams();
   el("sgTitle").value = state.sign.title || "";
   el("sgName").value = state.sign.name || "";
+  el("rsNama").value = state.rs.nama || "";
+  el("rsAlamat").value = state.rs.alamat || "";
 }
+el("rsNama").addEventListener("input", function(){ state.rs.nama = this.value; });
+el("rsAlamat").addEventListener("input", function(){ state.rs.alamat = this.value; });
 el("sgTitle").addEventListener("input", function(){ state.sign.title = this.value; });
 el("sgName").addEventListener("input", function(){ state.sign.name = this.value; });
 
@@ -294,7 +308,10 @@ function buildPrint(){
   left += "<div style='margin-top:30px;'>" + esc(state.sign.title) + "<br><br><br><br>( " + esc(state.sign.name) + " )</div>";
   var right = "<div class='judul'>Daftar TIM Obat Gudang Farmasi</div>" + pairPrint(state.obat) +
     "<div class='judul'>Daftar TIM Alkes Gudang Farmasi</div>" + pairPrint(state.alkes);
-  el("printArea").innerHTML = "<table style='border:none;'><tr>" +
+  el("printArea").innerHTML =
+    "<div style='margin-bottom:12px;'><div style='font-weight:bold;font-size:15px;'>" + esc(state.rs.nama) + "</div>" +
+    "<div>" + esc(state.rs.alamat) + "</div></div>" +
+    "<table style='border:none;'><tr>" +
     "<td style='border:none;width:55%;vertical-align:top;padding-right:14px;'>" + left + "</td>" +
     "<td style='border:none;width:45%;vertical-align:top;'>" + right + "</td></tr></table>";
 }
