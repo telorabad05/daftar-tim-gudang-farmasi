@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daftar Tim Gudang Farmasi — Tim Kurir &amp; Tim Obat</title>
+<title>Daftar Tim Gudang Farmasi — Tim Kurir, Tim Obat &amp; Tim Alkes</title>
 <style>
   :root{ --line:#c9d4d8; --bg:#eef3f4; }
   *{ box-sizing:border-box; }
@@ -59,7 +59,7 @@
 <header class="band">
   <div class="wrap">
     <h1>Daftar Tim Gudang Farmasi</h1>
-    <p>Tim Kurir dan Tim Obat &mdash; nama dan tempat tugas bisa diubah, disimpan, dan dicetak.</p>
+    <p>Tim Kurir, Tim Obat, dan Tim Alkes &mdash; nama dan tempat tugas bisa diubah, disimpan, dan dicetak.</p>
   </div>
 </header>
 <main>
@@ -83,6 +83,7 @@
       <button class="btn-ghost btn-small" id="btnTeam" style="margin-top:6px;">+ Tambah Tim</button>
     </div>
 
+    <div style="flex:1 1 420px;">
     <div class="card">
       <h2>Daftar TIM Obat Gudang Farmasi</h2>
       <table class="grid">
@@ -90,6 +91,16 @@
         <tbody id="obatBody"></tbody>
       </table>
       <button class="btn-ghost btn-small" id="btnObat">+ Tambah Baris</button>
+    </div>
+
+    <div class="card">
+      <h2>Daftar TIM Alkes Gudang Farmasi</h2>
+      <table class="grid">
+        <thead><tr><th class="no">No</th><th>Nama</th><th>Tempat Tugas</th><th class="act"></th></tr></thead>
+        <tbody id="alkesBody"></tbody>
+      </table>
+      <button class="btn-ghost btn-small" id="btnAlkes">+ Tambah Baris</button>
+    </div>
     </div>
   </div>
 
@@ -119,6 +130,7 @@ function defaultData(){
       { nama:"TIM C", tempat:"RIA/ICU HD", anggota:["Firman Junior","Aswin Junior","Rifai",""] }
     ],
     obat: [ { nama:"", tempat:"" }, { nama:"", tempat:"" }, { nama:"", tempat:"" } ],
+    alkes: [ { nama:"", tempat:"" }, { nama:"", tempat:"" }, { nama:"", tempat:"" } ],
     sign: { title:"KaSub Instalasi Pelayanan Kefarmasian Unit Pelayanan 5", name:"Juwita, S.Si, Apt., M.Kes" }
   };
 }
@@ -127,7 +139,11 @@ var state = defaultData();
 (function load(){
   try{
     var d = JSON.parse(localStorage.getItem(DB_KEY));
-    if(d && d.khusus && d.teams && d.obat) state = d;
+    if(d && d.khusus && d.teams && d.obat){
+      state = d;
+      if(!state.alkes) state.alkes = [ { nama:"", tempat:"" }, { nama:"", tempat:"" }, { nama:"", tempat:"" } ];
+      if(!state.sign) state.sign = defaultData().sign;
+    }
   }catch(e){}
 })();
 
@@ -230,6 +246,7 @@ function renderTeamsSoft(ti){
 function renderAll(){
   pairRows(el("khususBody"), state.khusus, "khusus");
   pairRows(el("obatBody"), state.obat, "obat");
+  pairRows(el("alkesBody"), state.alkes, "alkes");
   renderTeams();
   el("sgTitle").value = state.sign.title || "";
   el("sgName").value = state.sign.name || "";
@@ -239,6 +256,7 @@ el("sgName").addEventListener("input", function(){ state.sign.name = this.value;
 
 el("btnKhusus").addEventListener("click", function(){ state.khusus.push({ nama:"", tempat:"" }); renderAll(); });
 el("btnObat").addEventListener("click", function(){ state.obat.push({ nama:"", tempat:"" }); renderAll(); });
+el("btnAlkes").addEventListener("click", function(){ state.alkes.push({ nama:"", tempat:"" }); renderAll(); });
 el("btnTeam").addEventListener("click", function(){
   state.teams.push({ nama:"TIM " + String.fromCharCode(65 + state.teams.length), tempat:"", anggota:[""] });
   renderAll();
@@ -274,7 +292,8 @@ function buildPrint(){
   var left = "<div class='judul'>Daftar TIM KURIR Gudang Farmasi</div>" + pairPrint(state.khusus);
   state.teams.forEach(function(t){ left += teamPrint(t); });
   left += "<div style='margin-top:30px;'>" + esc(state.sign.title) + "<br><br><br><br>( " + esc(state.sign.name) + " )</div>";
-  var right = "<div class='judul'>Daftar TIM Obat Gudang Farmasi</div>" + pairPrint(state.obat);
+  var right = "<div class='judul'>Daftar TIM Obat Gudang Farmasi</div>" + pairPrint(state.obat) +
+    "<div class='judul'>Daftar TIM Alkes Gudang Farmasi</div>" + pairPrint(state.alkes);
   el("printArea").innerHTML = "<table style='border:none;'><tr>" +
     "<td style='border:none;width:55%;vertical-align:top;padding-right:14px;'>" + left + "</td>" +
     "<td style='border:none;width:45%;vertical-align:top;'>" + right + "</td></tr></table>";
